@@ -1,0 +1,81 @@
+pygame是python的2D游戏开发库
+
+
+著名的文字编辑器 vi 就是基于curses编的，
+curses名字起源于"cursor optimization"，即光标优化。在终端内绘制简单的图形用户界面。
+初始化操作就是调用initscr()函数
+关闭字符终端功能curses.nocbreak()#（只有回车时才发生终端）
+查看帮助
+dir(curses)
+help(curses)#会列出该模块的官方文件位置https://docs.python.org/3/library/curses.html
+实验楼中2048游戏的代码仓库
+https://github.com/shiyanlou/shiyanlou_cs427
+
+python中的super( test, self).__init__()首先找到test的父类（比如是类A），然后把类test的对象self转换为类A的对象，然后“被转换”的类A对象调用自己的__init__函数
+
+--------------------------------------------------------------------------------------
+import curses
+import random
+ 
+# initialize the window
+s = curses.initscr() #初始化操作，对象代表全部屏幕
+curses.curs_set(0)
+hei, wei = s.getmaxyx()  # the value of first getting is y,not x 坐标通过是先y后x
+w = curses.newwin(hei, wei, 0, 0) #新建一个新的窗口，需要给定窗口尺寸，并返回新的window对象
+w.keypad(1) #开启键盘模式。
+w.timeout(100)
+ 
+# initialize the position of snake
+sn_x = int(wei/4)
+sn_y = int(hei/2)
+snake = [[sn_y, sn_x], [sn_y, sn_x-1], [sn_y, sn_x-2]]
+ 
+# initialize the position of food
+food_pos = [int(hei/2), int(wei/2)]
+w.addch(food_pos[0], food_pos[1], '$')
+ 
+key = curses.KEY_RIGHT
+ 
+# start  getch()获取输入
+while True:
+    next_key = w.getch()  # The program stops waiting for user input. If not input for 100 milliseconds,go on
+    if next_key != -1:  # got the input char
+        if key == curses.KEY_RIGHT and next_key != curses.KEY_LEFT \
+                or key == curses.KEY_LEFT and next_key != curses.KEY_RIGHT \
+                or key == curses.KEY_DOWN and next_key != curses.KEY_UP \
+                or key == curses.KEY_UP and next_key != curses.KEY_DOWN:
+                key = next_key
+            
+    # the situation of death
+    if snake[0][0] in [0, hei] or snake[0][1] in [0, wei] or snake[0] in snake[1:]:
+        curses.endwin()
+        quit()
+ 
+    # update the 'snake'
+    temp = snake[0][0]
+    temp2 = snake[0][1]
+    new_head = [temp, temp2]
+    if key == curses.KEY_RIGHT: #检测按键
+        new_head[1] += 1
+    if key == curses.KEY_LEFT:
+        new_head[1] -= 1
+    if key == curses.KEY_DOWN:
+        new_head[0] += 1
+    if key == curses.KEY_UP:
+        new_head[0] -= 1
+    snake.insert(0, new_head)
+ 
+    # the situation of eating food
+    if snake[0] == food_pos:
+        food_pos = None
+        while food_pos is None:
+            new_food = [random.randint(1, hei-1), random.randint(1, wei-1)]
+            if new_food not in snake:
+                food_pos = new_food
+        w.addch(food_pos[0], food_pos[1], '$')
+    else:
+        tail = snake.pop()
+        w.addch(tail[0], tail[1], ' ')  # remove the tail
+ 
+    # snake move
+    w.addch(snake[0][0], snake[0][1], '@')
