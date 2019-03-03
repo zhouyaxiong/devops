@@ -23,3 +23,5 @@ def showpost(request,slug):
             return HttpResponse(html)
     except:
         return redirect('/')
+
+
