@@ -1,0 +1,35 @@
+#!/bin/bash
+################################################
+#for check system before exec switch keepalived
+#nc:01381126
+#version:0.9  20190306
+################################################
+check1(){
+NUM=`ps aux|grep java|grep -v grep|wc -l`
+if [[ $NUM -eq 4 ]]
+        then echo "当前运行的进程数为4"
+        else echo '当前运行的java进程数是$NUM'
+fi
+IP_NUM=`ip a| grep inet | grep -v grep | wc -l`
+IP_NUM2=`ip a|grep bond0|wc -l`
+if [[ $IP_NUM -eq 3 || $IP_NUM2 -eq 1 ]]
+        then echo "当前系统是主APP"
+        else echo '当前系统是备APP'
+fi
+}
+main(){
+check1
+#sudo /etc/init.d/keepalived restart
+check1
+cd ~;cd script/;sh ./lijian.sh app
+cd ~
+cd script/
+sh ./lijian.sh app
+cat <<eof
+**************************************************
+服务器切换完毕，请检查应用日志是否错误，数据库下发
+**************************************************
+eof
+
+}
+main

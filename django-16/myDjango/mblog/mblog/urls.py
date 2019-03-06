@@ -15,7 +15,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.conf.urls import include,url
+from mainsite.views import homepage,showpost,index
+my_url = [
+    url(r'(\d{1|2}/$)',views.index,name='tv-urls')
+]
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    url(r'^$', homepage),
+    url(r'^admin/', admin.site.urls),
+    url(r'^post/(\d+)$', showpost),
+    #url(r'^tv$',include(my_url))
 ]
