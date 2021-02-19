@@ -7,7 +7,7 @@
  cat prometheus-serviceMonitorKubeScheduler.yaml   
 selector.matchLabels在kube-system这个命名空间下面匹配具有k8s-app=kube-scheduler，app.kubernetes.io/name=kube-scheduler这样的Service，但是系统中没有对应的Service，新建这个service就可了
 
-
+检查serviceMonitor也可以通过查看这个资源对象或者从rancher中查看
 
 
 对kube-scheduler的监控

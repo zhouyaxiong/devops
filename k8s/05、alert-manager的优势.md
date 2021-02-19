@@ -53,6 +53,9 @@ description: '{{ $value | humanizePercentage }} of Alertmanager instances within
 summary: Alertmanager instances within the same cluster have different configurations：
 count by(namespace, service) (count_values by(namespace, service) ("config_hash", alertmanager_config_hash{job="alertmanager-main",namespace="monitoring"})) != 1
 
+alertmanager配置加载失败的，发送告警失败的
+
+
 
 
  ```
