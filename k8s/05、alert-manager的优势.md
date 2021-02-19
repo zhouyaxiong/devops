@@ -30,3 +30,29 @@ AlertManager的三个概念
 + 将多个集群的prometheus联邦起来，再统一使用alertmanager进行告警，告警方式只在一台上面配置即可
 + 在Alertmanager中可以使用如下配置定义基于webhook的告警接收器receiver。一个receiver可以对应一组webhook配置。  
 +  
+
+```
+prometheus自带的监控项说明：
+alertmanager集群一半覆灭
+ (count by(namespace, service) (avg_over_time(up{job="alertmanager-main",namespace="monitoring"}[5m]) < 0.5) [定义出分子]/ count by(namespace, service) (up{job="alertmanager-main",namespace="monitoring"})) >= 0.5
+
+description: '{{ $value | humanizePercentage }} of Alertmanager instances within the {{$labels.job}} cluster have been up for less than half of the last 5m.'
+
+
+up输出在用的，avg_over_time取一段时间的均值
+process_start_time_seconds，输出的是pod的创建时间，这个时间是不会变的
+
+alertmanager集群崩溃
+ (count by(namespace, service) (changes(process_start_time_seconds{job="alertmanager-main",namespace="monitoring"}[10m]) > 4) / count by(namespace, service) (up{job="alertmanager-main",namespace="monitoring"})) >= 0.5
+
+description：
+先找出10分钟内pod的创建时间改变超过4次的
+description: '{{ $value | humanizePercentage }} of Alertmanager instances within the {{$labels.job}} cluster have restarted at least 5 times in the last 10m.'
+
+
+summary: Alertmanager instances within the same cluster have different configurations：
+count by(namespace, service) (count_values by(namespace, service) ("config_hash", alertmanager_config_hash{job="alertmanager-main",namespace="monitoring"})) != 1
+
+
+
+ ```
